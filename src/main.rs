@@ -1,19 +1,16 @@
-use std::io;
+use std::io::{self, Write};
 use rand::{thread_rng, Rng};
 
 struct Board {
     size: usize,
     cells: Vec<u32>,
-    min_val: u32,   // here store available min value
-    max_val: u32,   // and achieved max value
-                    // based on those generator will
-                    // generate next number
+    max_num: u32,
 }
 
 impl Board {
     fn print(&self) {
         for (i, c) in self.cells.iter().enumerate() {
-            print!("{:04}", c);
+            self.print_fmt(*c);
             if (i + 1) % self.size == 0 {
                 println!();
             } else {
@@ -22,26 +19,52 @@ impl Board {
         }
     }
 
+    fn print_fmt(&self, c: u32) {
+        let digits = Board::get_digits(self.max_num);
+        match digits {
+            2 => { print!("{:02}", c); },
+            3 => { print!("{:03}", c); },
+            4 => { print!("{:04}", c); },
+            _ => { print!("{}", c); },
+        };
+    }
+
+    // Returns how many digits has the number in dec
+    fn get_digits(num: u32) -> u32 {
+        let mut n = num;
+        let mut cnt = 0;
+        while n != 0 {
+            n = n / 10;
+            cnt = cnt + 1;
+        }
+        cnt
+    }
+
     fn get_input(&self) {
         let mut guess = String::new();
 
+        print!("Input: ");
+        io::stdout().flush();
         io::stdin()
             .read_line(&mut guess)
             .expect("Failed to read line!");
 
-        print!("Your input: {}", guess);
         match guess.chars().next().unwrap() {
             'h' => print!("Shift left"),
             'j' => print!("Shift down"),
             'k' => print!("Shift up"),
             'l' => print!("Shift right"),
-             _  => println!("Enter one of h j k l"),
+             _  => println!("Enter one of h/j/k/l"),
         }
     }
 
     fn generate(&self) -> u32 {
         let mut rng = thread_rng();
-        rng.gen_range(self.min_val, self.max_val + 1)
+        match rng.gen_range(0, 2) as u8 {
+            0 => 2,
+            1 => 4,
+            _ => 8,
+        }
     }
 
     fn get_location(&self, index: u32) -> (u32, u32) {
@@ -77,9 +100,16 @@ impl Board {
         &mut self.cells[v[idx]]
     }
 
+    fn update_max(&mut self, num: u32) -> u32 {
+        if num > self.max_num {
+            self.max_num = num;
+        }
+        num
+    }
+
     fn init(&mut self) {
-        *self.get_free_cell() = self.generate();
-        *self.get_free_cell() = self.generate();
+        *self.get_free_cell() = self.update_max(self.generate());
+        *self.get_free_cell() = self.update_max(self.generate());
     }
 }
 
@@ -88,10 +118,9 @@ fn main() {
     let mut b = Board {
         size: size, // Size is 4x4
         cells: vec![0; size * size],
-        min_val: 1,
-        max_val: 2,
+        max_num: 0
     };
-    println!("Hello, world!");
+
     b.init();
     b.print();
     b.get_input();
