@@ -111,12 +111,39 @@ impl Board {
         *self.get_free_cell() = self.update_max(self.generate());
         *self.get_free_cell() = self.update_max(self.generate());
     }
+
+    fn move_left(&mut self, line_nr: usize) {
+        let si = line_nr * self.size;
+        let mut cn = self.cells[si];
+        let mut pi = si + 0;
+        for n in si + 1 .. si + self.size {
+            //println!("n: {}", n);
+            if self.cells[n] != 0 {
+                if self.cells[n] == cn {
+                    self.cells[pi] = self.update_max(2 * cn);
+                    cn = 0;
+                    pi = pi + 1;
+                    self.cells[n] = 0;
+                } else if cn == 0 {
+                    cn = self.cells[n];
+                    self.cells[pi] = cn;
+                    self.cells[n] = 0;
+                } else {
+                    pi = pi + 1;
+                    cn = self.cells[n];
+                    self.cells[pi] = cn;
+                    self.cells[n] = 0;
+                }
+            }
+        }
+    }
 }
 
 fn main() {
-    let size = 4;
+    let size = 4; // Size is 4x4
+
     let mut b = Board {
-        size: size, // Size is 4x4
+        size: size,
         cells: vec![0; size * size],
         max_num: 0
     };
@@ -124,4 +151,101 @@ fn main() {
     b.init();
     b.print();
     b.get_input();
+}
+
+#[cfg(test)]
+mod test {
+    use super::Board;
+
+    #[test]
+    fn basics() {
+        let mut board = Board {
+            size: 4,
+            cells: vec![0; 16],
+            max_num: 0,
+        };
+
+        board.init();
+
+        // The board shall have only 2 filled cells
+        let mut cnt = 0;
+        let it = board.cells.iter();
+        it.for_each(|x| if *x != 0 {cnt = cnt + 1; });
+        assert_eq!(cnt, 2);
+
+        // The max num may not be greater than 4
+        assert!(board.max_num <= 4);
+    }
+
+    #[test]
+    fn test_move_left() {
+        let mut board = Board {
+            size: 4,
+            cells: vec![0; 16],
+            max_num: 0,
+        };
+
+        let idx = board.get_index((0, 0));
+        board.cells[idx] = 2;
+        let idx = board.get_index((2, 0));
+        board.cells[idx] = 2;
+        let idx = board.get_index((0, 1));
+        board.cells[idx] = 2;
+        let idx = board.get_index((1, 1));
+        board.cells[idx] = 2;
+        let idx = board.get_index((2, 1));
+        board.cells[idx] = 2;
+        let idx = board.get_index((3, 1));
+        board.cells[idx] = 2;
+        let idx = board.get_index((1, 2));
+        board.cells[idx] = 4;
+        let idx = board.get_index((3, 2));
+        board.cells[idx] = 2;
+        let idx = board.get_index((1, 3));
+        board.cells[idx] = 4;
+        let idx = board.get_index((2, 3));
+        board.cells[idx] = 4;
+
+        board.max_num = 4;
+
+        board.print();
+
+        board.move_left(0);
+//        println!();
+//        board.print();
+
+        assert!(board.max_num == 4);
+        assert_eq!(board.cells[board.get_index((0, 0))], 4);
+        assert_eq!(board.cells[board.get_index((1, 0))], 0);
+        assert_eq!(board.cells[board.get_index((2, 0))], 0);
+        assert_eq!(board.cells[board.get_index((3, 0))], 0);
+
+        board.move_left(1);
+//        println!();
+//        board.print();
+
+        assert_eq!(board.cells[board.get_index((0, 1))], 4);
+        assert_eq!(board.cells[board.get_index((1, 1))], 4);
+        assert_eq!(board.cells[board.get_index((2, 1))], 0);
+        assert_eq!(board.cells[board.get_index((3, 1))], 0);
+
+        board.move_left(2);
+//        println!();
+//        board.print();
+
+        assert_eq!(board.cells[board.get_index((0, 2))], 4);
+        assert_eq!(board.cells[board.get_index((1, 2))], 2);
+        assert_eq!(board.cells[board.get_index((2, 2))], 0);
+        assert_eq!(board.cells[board.get_index((3, 2))], 0);
+
+        board.move_left(3);
+//        println!();
+//        board.print();
+
+        assert!(board.max_num == 8);
+        assert_eq!(board.cells[board.get_index((0, 3))], 8);
+        assert_eq!(board.cells[board.get_index((1, 3))], 0);
+        assert_eq!(board.cells[board.get_index((2, 3))], 0);
+        assert_eq!(board.cells[board.get_index((3, 3))], 0);
+    }
 }
