@@ -128,11 +128,16 @@ impl Board {
         self.try_add_number();
     }
 
-    fn move_any<F>(&mut self, init_pos: usize, get_idx: &F) where 
+    // returns true in case changes were made after move
+    fn move_any<F>(&mut self, init_pos: usize, get_idx: &F) -> bool where
         // The closure takes line nr and index pos and returns index position
         F: Fn(usize, usize) -> usize {
             let mut cn = 0;
             let mut vr = vec!();
+            let mut dst = vec![0; self.size * self.size];
+
+            dst.copy_from_slice(&self.cells[0..]);
+
             for n in 0 .. self.size {
                 //println!("n: {}", n);
                 let val = self.cells[get_idx(init_pos, n)]; 
@@ -150,7 +155,7 @@ impl Board {
                 }
             }
             vr.push(cn);
-            println!("{:?}", vr);
+            //println!("{:?}", vr);
             for n in 0 .. self.size {
                 let ci = get_idx(init_pos, n);
                 if vr.len() > n {
@@ -159,6 +164,10 @@ impl Board {
                     self.cells[ci] = 0;
                 }
             }
+
+            !dst.iter()
+             .zip(&self.cells)
+             .all(|(a,b)| *a == *b)
         }
 
     fn check_win(&self) -> bool {
@@ -193,11 +202,16 @@ fn main() {
                 move_fn = Box::new(|base_row, index| size * (size - index - 1) + base_row);
             },
         }
+        let mut changed = false;
         for i in 0 .. 4 {
-            b.move_any(i, &move_fn);
+            let res = b.move_any(i, &move_fn);
+            changed = changed || res;
         }
-        if !b.try_add_number() {
-            println!("Better luck next time!");
+        //print!("good {}", changed);
+        if changed {
+            if !b.try_add_number() {
+                println!("Better luck next time!");
+            }
         }
         if b.check_win() {
             println!("You are WINNER!!!");
@@ -575,4 +589,42 @@ mod test {
         assert_eq!(board.cells[board.get_index((2, 2))], 0);
     }
 
+    #[test]
+//  0-0-2-0
+//  0-0-0-0
+//  0-0-0-0
+//  0-0-4-0
+//  Input: l
+//  0-0-2-2
+//  0-0-0-0
+//  0-0-0-0
+//  0-0-4-0
+    fn test_case2() {
+        let mut board = Board {
+            size: 4,
+            cells: vec![0; 16],
+            max_num: 0,
+        };
+
+        let idx = board.get_index((2, 0));
+        board.cells[idx] = 2;
+        let idx = board.get_index((2, 3));
+        board.cells[idx] = 4;
+
+        board.print();
+        let board_size = board.size;
+        let move_right = |base_line, index| (1 + base_line) * board_size - 1 - index;
+        for i in 0 .. 4 {
+            board.move_any(i, &move_right);
+        }
+
+        println!();
+        board.print();
+
+        assert_eq!(board.cells[board.get_index((3, 0))], 2);
+        assert_eq!(board.cells[board.get_index((3, 3))], 4);
+
+        assert_eq!(board.cells[board.get_index((2, 0))], 0);
+        assert_eq!(board.cells[board.get_index((2, 3))], 0);
+    }
 }
