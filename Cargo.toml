@@ -1,10 +1,17 @@
 [package]
 name = "txt2048"
 version = "0.1.0"
-authors = ["Oleksandr Pushkar <alexanderpushkar86@gmail.com>"]
+authors = ["Alex Pushkar <alexanderpushkar86@gmail.com>"]
+license = "MIT"
+description = "The known 2048 game made in console mode. Use hjkl for movement."
+readme = "README.md"
+homepage = "https://github.com/olksdar/txt2048"
+repository = "https://github.com/olksdar/txt2048"
+keywords = ["cli", "game", "2048"]
+categories = ["games"] 
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "*"
+rand = "0.7.3"
