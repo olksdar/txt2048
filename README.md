@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/olksdar/txt_2048.svg?branch=main)](https://travis-ci.com/olksdar/txt_2048)
+[![Build Status](https://app.travis-ci.com/olksdar/txt2048.svg?branch=main)](https://travis-ci.com/olksdar/txt_2048)
 
 # txt2048
 2048 in text made with rust
