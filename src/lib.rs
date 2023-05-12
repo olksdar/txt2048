@@ -1,6 +1,4 @@
 use rand::{thread_rng, Rng};
-use std::io::{self, Write};
-
 
 pub struct Board {
     size: usize,
@@ -8,12 +6,15 @@ pub struct Board {
     max_num: u32,
 }
 
-//#[derive(Debug)]
-pub enum Dir {
-    Left,
-    Right,
-    Up,
-    Down,
+pub trait ExtModify {
+    fn set_cell(&mut self, x: usize, y: usize, value: u32);
+}
+
+impl ExtModify for Board {
+    fn set_cell(&mut self, x: usize, y: usize, value: u32) {
+        let idx = self.get_index(x, y);
+        self.cells[idx] = value;
+    }
 }
 
 impl Board {
@@ -29,76 +30,8 @@ impl Board {
         self.max_num
     }
 
-    pub fn set_cell(&mut self, x: usize, y: usize, value: u32) {
-        let idx = self.get_index(x, y);
-        self.cells[idx] = value;
-    }
-
     pub fn get_cell(&mut self, x: usize, y: usize) -> u32 {
         self.cells[self.get_index(x, y)]
-    }
-
-    pub fn print(&self) {
-        for (i, c) in self.cells.iter().enumerate() {
-            self.print_fmt(*c);
-            if (i + 1) % self.size == 0 {
-                println!();
-                if self.max_num > 99 {
-                    println!();
-                }
-            } else {
-                print!(" ");
-            }
-        }
-    }
-
-    fn print_fmt(&self, c: u32) {
-        let digits = Board::get_digits(self.max_num);
-        match digits {
-            2 => {
-                print!("{:2}", c);
-            }
-            3 => {
-                print!("{:3}", c);
-            }
-            4 => {
-                print!("{:4}", c);
-            }
-            _ => {
-                print!("{}", c);
-            }
-        };
-    }
-
-    // Returns how many digits has the number in dec
-    fn get_digits(num: u32) -> u32 {
-        let mut n = num;
-        let mut cnt = 0;
-        while n != 0 {
-            n = n / 10;
-            cnt = cnt + 1;
-        }
-        cnt
-    }
-
-    pub fn get_input(&self) -> Dir {
-        loop {
-            let mut guess = String::new();
-
-            print!("Input: ");
-            io::stdout().flush().expect("Failed to flush!");
-            io::stdin()
-                .read_line(&mut guess)
-                .expect("Failed to read line!");
-
-            match guess.chars().next().unwrap() {
-                'h' => return Dir::Left,
-                'j' => return Dir::Down,
-                'k' => return Dir::Up,
-                'l' => return Dir::Right,
-                _ => println!("Enter one of h/j/k/l"),
-            }
-        }
     }
 
     fn generate(&self) -> u32 {
@@ -169,7 +102,6 @@ impl Board {
         }
     }
 
-
     // returns true in case changes were made after move
     pub fn move_any<F>(&mut self, init_pos: usize, get_idx: &F) -> bool
     where
@@ -215,40 +147,16 @@ impl Board {
         return self.max_num >= 2048;
     }
 
-    pub fn check_lose(&self) -> bool {
-        let size = self.size;
+    pub fn check_game_over(&self) -> bool {
+        // If no space left and no adjacent blocks are the same then game is over
+        let check_adj_left = |index | if index % self.size == 0 {false} else {self.cells[index] == self.cells[index - 1]};
+        let check_adj_up = |index| if index < self.size {false} else {self.cells[index] == self.cells[index - self.size]};
 
-        let mut tmp = Board {
-            size: size,
-            cells: vec![0; size * size],
-            max_num: self.max_num,
+        for idx in 0..(self.size*self.size) {
+            if self.cells[idx] == 0 || check_adj_left(idx) || check_adj_up(idx) { 
+                return false;
+            }
         };
-
-        tmp.cells.copy_from_slice(&self.cells[0..]);
-        let direct = vec![Dir::Down, Dir::Left, Dir::Right, Dir::Up];
-
-        for d in direct {
-            let move_fn: Box<dyn Fn(usize, usize) -> usize>;
-            match d {
-                Dir::Left => {
-                    move_fn = Box::new(|base_line, index| base_line * size + index);
-                }
-                Dir::Right => {
-                    move_fn = Box::new(|base_line, index| (1 + base_line) * size - 1 - index);
-                }
-                Dir::Up => {
-                    move_fn = Box::new(|base_row, index| index * size + base_row);
-                }
-                Dir::Down => {
-                    move_fn = Box::new(|base_row, index| size * (size - index - 1) + base_row);
-                }
-            }
-            for i in 0..size {
-                if tmp.move_any(i, &move_fn) {
-                    return false;
-                }
-            }
-        }
         true
     }
 }

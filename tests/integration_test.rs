@@ -1,4 +1,5 @@
 use txt2048::Board as Board;
+use txt2048::ExtModify;
 
 #[test]
 fn basics() {
@@ -312,33 +313,38 @@ fn test_case2() {
 }
 
 #[test]
-fn test_loose() {
-    let mut board = Board::new(4);
+fn case_no_loose_one_empty() {
+    let mut board = Board::new(2);
     board.set_cell(0, 0, 2);
-    board.set_cell(0, 1, 64);
-    board.set_cell(0, 2, 2);
-    board.set_cell(0, 3, 8);
-    board.set_cell(1, 0, 8);
-    board.set_cell(1, 1, 16);
-    board.set_cell(1, 2, 64);
-    board.set_cell(1, 3, 2);
-    board.set_cell(2, 0, 4);
-    board.set_cell(2, 1, 64);
-    board.set_cell(2, 2, 32);
-    board.set_cell(2, 3, 8);
-    board.set_cell(3, 0, 8);
-    board.set_cell(3, 1, 2);
-    board.set_cell(3, 2, 4);
-    board.set_cell(3, 3, 2);
-
-    assert!(board.check_lose())
+    board.set_cell(0, 1, 4);
+    board.set_cell(1, 1, 8);
+    // cell (1,0) is free -> no loose assert!(!board.check_lose2());
+    assert!(!board.check_game_over());
 }
 
 #[test]
-fn test_loose1() {
-    let mut board = Board::new(4);
-    board.set_cell(2, 0, 2);
-    board.set_cell(2, 3, 4);
-
-    assert!(!board.check_lose());
+fn case_no_loose_one_adjacent() {
+    let mut board = Board::new(2);
+    board.set_cell(0, 0, 2);
+    board.set_cell(0, 1, 4);
+    board.set_cell(1, 1, 8);
+     // cell (1,0) is adjacent to (1,1) with value 8
+    board.set_cell(1, 0, 8);
+    assert!(!board.check_game_over());
 }
+
+#[test]
+fn case_loose_all_different() {
+    let mut board = Board::new(2);
+    board.set_cell(0, 0, 2);
+    board.set_cell(0, 1, 4);
+    board.set_cell(1, 1, 8);
+     // all the cells are different
+    board.set_cell(1, 0, 16);
+    assert!(board.check_game_over());
+}
+
+
+
+
+   
