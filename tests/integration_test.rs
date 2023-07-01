@@ -1,5 +1,5 @@
-use txt2048::Board as Board;
-use txt2048::ExtModify;
+use txt2048::Board;
+use txt2048::Dir;
 
 #[test]
 fn basics() {
@@ -21,7 +21,7 @@ fn basics() {
 }
 
 #[test]
-fn test_move_left() {
+fn move_left() {
     let mut board = Board::new(4);
 
     board.set_cell(0, 0, 2);
@@ -35,55 +35,35 @@ fn test_move_left() {
     board.set_cell(1, 3, 4);
     board.set_cell(2, 3, 4);
 
-    //board.get_max_num() = 4;
+    board.move_dir(Dir::Left);
 
- //   board.print();
+    assert_eq!(board.get_cell(0, 0), 4);
+    assert_eq!(board.get_cell(1, 0), 0);
+    assert_eq!(board.get_cell(2, 0), 0);
+    assert_eq!(board.get_cell(3, 0), 0);
 
-    let board_size = board.size();
-    let move_left = |base_line, index| base_line * board_size + index;
-    board.move_any(0, &move_left);
-    //        println!();
-    //        board.print();
+    assert_eq!(board.get_cell(0, 1), 4);
+    assert_eq!(board.get_cell(1, 1), 4);
+    assert_eq!(board.get_cell(2, 1), 0);
+    assert_eq!(board.get_cell(3, 1), 0);
 
-    assert!(board.get_max_num() == 4);
-    assert_eq!(board.get_cell(0, 0),  4);
-    assert_eq!(board.get_cell(1, 0),  0);
-    assert_eq!(board.get_cell(2, 0),  0);
-    assert_eq!(board.get_cell(3, 0),  0);
+    assert_eq!(board.get_cell(0, 2), 4);
+    assert_eq!(board.get_cell(1, 2), 2);
+    assert_eq!(board.get_cell(2, 2), 0);
+    assert_eq!(board.get_cell(3, 2), 0);
 
-    board.move_any(1, &move_left);
-    //        println!();
-    //        board.print();
-
-    assert_eq!(board.get_cell(0, 1),  4);
-    assert_eq!(board.get_cell(1, 1),  4);
-    assert_eq!(board.get_cell(2, 1),  0);
-    assert_eq!(board.get_cell(3, 1),  0);
-
-    board.move_any(2, &move_left);
-    //        println!();
-    //        board.print();
-
-    assert_eq!(board.get_cell(0, 2),  4);
-    assert_eq!(board.get_cell(1, 2),  2);
-    assert_eq!(board.get_cell(2, 2),  0);
-    assert_eq!(board.get_cell(3, 2),  0);
-
-    board.move_any(3, &move_left);
-    //        println!();
-    //        board.print();
+    assert_eq!(board.get_cell(0, 3), 8);
+    assert_eq!(board.get_cell(1, 3), 0);
+    assert_eq!(board.get_cell(2, 3), 0);
+    assert_eq!(board.get_cell(3, 3), 0);
 
     assert!(board.get_max_num() == 8);
-    assert_eq!(board.get_cell(0, 3),  8);
-    assert_eq!(board.get_cell(1, 3),  0);
-    assert_eq!(board.get_cell(2, 3),  0);
-    assert_eq!(board.get_cell(3, 3),  0);
 }
 
 #[test]
-fn test_move_right() {
+fn move_right() {
     let mut board = Board::new(4);
- 
+
     board.set_cell(0, 0, 2);
     board.set_cell(2, 0, 2);
     board.set_cell(0, 1, 2);
@@ -94,50 +74,34 @@ fn test_move_right() {
     board.set_cell(3, 2, 2);
     board.set_cell(1, 3, 4);
     board.set_cell(2, 3, 4);
-//    board.print();
 
-    let board_size = board.size();
-    let move_right = |base_line, index| (1 + base_line) * board_size - 1 - index;
-    board.move_any(0, &move_right);
-    // println!();
-    // board.print();
+    board.move_dir(Dir::Right);
 
-    assert!(board.get_max_num() == 4);
-    assert_eq!(board.get_cell(0, 0),  0);
-    assert_eq!(board.get_cell(1, 0),  0);
-    assert_eq!(board.get_cell(2, 0),  0);
-    assert_eq!(board.get_cell(3, 0),  4);
+    assert_eq!(board.get_cell(0, 0), 0);
+    assert_eq!(board.get_cell(1, 0), 0);
+    assert_eq!(board.get_cell(2, 0), 0);
+    assert_eq!(board.get_cell(3, 0), 4);
 
-    board.move_any(1, &move_right);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(0, 1),  0);
-    assert_eq!(board.get_cell(1, 1),  0);
-    assert_eq!(board.get_cell(2, 1),  4);
-    assert_eq!(board.get_cell(3, 1),  4);
+    assert_eq!(board.get_cell(0, 1), 0);
+    assert_eq!(board.get_cell(1, 1), 0);
+    assert_eq!(board.get_cell(2, 1), 4);
+    assert_eq!(board.get_cell(3, 1), 4);
 
-    board.move_any(2, &move_right);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(0, 2),  0);
-    assert_eq!(board.get_cell(1, 2),  0);
-    assert_eq!(board.get_cell(2, 2),  4);
-    assert_eq!(board.get_cell(3, 2),  2);
+    assert_eq!(board.get_cell(0, 2), 0);
+    assert_eq!(board.get_cell(1, 2), 0);
+    assert_eq!(board.get_cell(2, 2), 4);
+    assert_eq!(board.get_cell(3, 2), 2);
 
-    board.move_any(3, &move_right);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(0, 3),  0);
-    assert_eq!(board.get_cell(1, 3),  0);
-    assert_eq!(board.get_cell(2, 3),  0);
-    assert_eq!(board.get_cell(3, 3),  8);
+    assert_eq!(board.get_cell(0, 3), 0);
+    assert_eq!(board.get_cell(1, 3), 0);
+    assert_eq!(board.get_cell(2, 3), 0);
+    assert_eq!(board.get_cell(3, 3), 8);
 
     assert!(board.get_max_num() == 8);
 }
 
-
 #[test]
-fn test_move_down() {
+fn move_down() {
     let mut board = Board::new(4);
     board.set_cell(0, 0, 2);
     board.set_cell(2, 0, 2);
@@ -150,49 +114,33 @@ fn test_move_down() {
     board.set_cell(1, 3, 4);
     board.set_cell(2, 3, 4);
 
-    let board_size = board.size();
-    let move_down = |base_row, index| board_size * (board_size - index - 1) + base_row;
+    board.move_dir(Dir::Down);
 
-    board.move_any(0, &move_down);
-    // println!();
-    // board.print();
+    assert_eq!(board.get_cell(0, 0), 0);
+    assert_eq!(board.get_cell(0, 1), 0);
+    assert_eq!(board.get_cell(0, 2), 0);
+    assert_eq!(board.get_cell(0, 3), 4);
 
-    assert!(board.get_max_num()== 4);
-    assert_eq!(board.get_cell(0, 0),  0);
-    assert_eq!(board.get_cell(0, 1),  0);
-    assert_eq!(board.get_cell(0, 2),  0);
-    assert_eq!(board.get_cell(0, 3),  4);
+    assert_eq!(board.get_cell(1, 0), 0);
+    assert_eq!(board.get_cell(1, 1), 0);
+    assert_eq!(board.get_cell(1, 2), 2);
+    assert_eq!(board.get_cell(1, 3), 8);
 
-    board.move_any(1, &move_down);
-    // println!();
-    // board.print();
+    assert_eq!(board.get_cell(2, 0), 0);
+    assert_eq!(board.get_cell(2, 1), 0);
+    assert_eq!(board.get_cell(2, 2), 4);
+    assert_eq!(board.get_cell(2, 3), 4);
 
-    assert!(board.get_max_num() == 8);
-    assert_eq!(board.get_cell(1, 0),  0);
-    assert_eq!(board.get_cell(1, 1),  0);
-    assert_eq!(board.get_cell(1, 2),  2);
-    assert_eq!(board.get_cell(1, 3),  8);
+    assert_eq!(board.get_cell(3, 0), 0);
+    assert_eq!(board.get_cell(3, 1), 0);
+    assert_eq!(board.get_cell(3, 2), 0);
+    assert_eq!(board.get_cell(3, 3), 4);
 
-    board.move_any(2, &move_down);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(2, 0),  0);
-    assert_eq!(board.get_cell(2, 1),  0);
-    assert_eq!(board.get_cell(2, 2),  4);
-    assert_eq!(board.get_cell(2, 3),  4);
-
-    board.move_any(3, &move_down);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(3, 0),  0);
-    assert_eq!(board.get_cell(3, 1),  0);
-    assert_eq!(board.get_cell(3, 2),  0);
-    assert_eq!(board.get_cell(3, 3),  4);
     assert!(board.get_max_num() == 8);
 }
 
 #[test]
-fn test_move_up() {
+fn move_up() {
     let mut board = Board::new(4);
     board.set_cell(0, 0, 2);
     board.set_cell(2, 0, 2);
@@ -205,146 +153,115 @@ fn test_move_up() {
     board.set_cell(1, 3, 4);
     board.set_cell(2, 3, 4);
 
-    // board.print();
+    board.move_dir(Dir::Up);
 
-    let board_size = board.size();
-    let move_up = |base_row, index| index * board_size + base_row;
-    board.move_any(0, &move_up);
-    // println!();
-    // board.print();
+    assert_eq!(board.get_cell(0, 0), 4);
+    assert_eq!(board.get_cell(0, 1), 0);
+    assert_eq!(board.get_cell(0, 2), 0);
+    assert_eq!(board.get_cell(0, 3), 0);
 
-    assert!(board.get_max_num()== 4);
-    assert_eq!(board.get_cell(0, 0),  4);
-    assert_eq!(board.get_cell(0, 1),  0);
-    assert_eq!(board.get_cell(0, 2),  0);
-    assert_eq!(board.get_cell(0, 3),  0);
+    assert_eq!(board.get_cell(1, 0), 2);
+    assert_eq!(board.get_cell(1, 1), 8);
+    assert_eq!(board.get_cell(1, 2), 0);
+    assert_eq!(board.get_cell(1, 3), 0);
 
-    board.move_any(1, &move_up);
-    // println!();
-    // board.print();
+    assert_eq!(board.get_cell(2, 0), 4);
+    assert_eq!(board.get_cell(2, 1), 4);
+    assert_eq!(board.get_cell(2, 2), 0);
+    assert_eq!(board.get_cell(2, 3), 0);
+
+    assert_eq!(board.get_cell(3, 0), 4);
+    assert_eq!(board.get_cell(3, 1), 0);
+    assert_eq!(board.get_cell(3, 2), 0);
+    assert_eq!(board.get_cell(3, 3), 0);
 
     assert!(board.get_max_num() == 8);
-    assert_eq!(board.get_cell(1, 0),  2);
-    assert_eq!(board.get_cell(1, 1),  8);
-    assert_eq!(board.get_cell(1, 2),  0);
-    assert_eq!(board.get_cell(1, 3),  0);
-
-    board.move_any(2, &move_up);
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(2, 0),  4);
-    assert_eq!(board.get_cell(2, 1),  4);
-    assert_eq!(board.get_cell(2, 2),  0);
-    assert_eq!(board.get_cell(2, 3),  0);
-
-    board.move_any(3, &move_up);
-    // println!();
-    // board.print();
-
-    assert!(board.get_max_num()== 8);
-    assert_eq!(board.get_cell(3, 0),  4);
-    assert_eq!(board.get_cell(3, 1),  0);
-    assert_eq!(board.get_cell(3, 2),  0);
-    assert_eq!(board.get_cell(3, 3),  0);
 }
 
 #[test]
-//  2-0-0-0
-//  0-0-0-0
-//  8-0-0-0
-//  4-0-0-0
-//  Input: j
-//  0-0-0-0
-//  2-0-0-0
-//  0-0-2-0
-//  4-0-0-0
-fn test_case1() {
+fn move_down_stacked() {
     let mut board = Board::new(4);
     board.set_cell(0, 0, 2);
     board.set_cell(0, 2, 8);
     board.set_cell(0, 3, 4);
 
-    // board.print();
-    let board_size = board.size();
-    let move_down = |base_row, index| board_size * (board_size - index - 1) + base_row;
-    for i in 0..4 {
-        board.move_any(i, &move_down);
-    }
-
-    // println!();
-    // board.print();
+    board.move_dir(Dir::Down);
 
     assert!(board.get_max_num() == 8);
-    assert_eq!(board.get_cell(0, 0),  0);
-    assert_eq!(board.get_cell(0, 1),  2);
-    assert_eq!(board.get_cell(0, 2),  8);
-    assert_eq!(board.get_cell(0, 3),  4);
-    assert_eq!(board.get_cell(2, 2),  0);
+    assert_eq!(board.get_cell(0, 0), 0);
+    assert_eq!(board.get_cell(0, 1), 2);
+    assert_eq!(board.get_cell(0, 2), 8);
+    assert_eq!(board.get_cell(0, 3), 4);
+    assert_eq!(board.get_cell(2, 2), 0);
 }
 
 #[test]
-//  0-0-2-0
-//  0-0-0-0
-//  0-0-0-0
-//  0-0-4-0
-//  Input: l
-//  0-0-0-2
-//  0-0-0-0
-//  0-0-0-0
-//  0-0-0-4
-fn test_case2() {
+fn move_rigth_integration() {
     let mut board = Board::new(4);
     board.set_cell(2, 0, 2);
     board.set_cell(2, 3, 4);
-   
-    // board.print();
-    let board_size = board.size();
-    let move_right = |base_line, index| (1 + base_line) * board_size - 1 - index;
-    for i in 0..4 {
-        board.move_any(i, &move_right);
-    }
 
-    // println!();
-    // board.print();
-    assert_eq!(board.get_cell(3, 0),  2);
-    assert_eq!(board.get_cell(3, 3),  4);
-    assert_eq!(board.get_cell(2, 0),  0);
-    assert_eq!(board.get_cell(2, 3),  0);
+    board.move_dir(Dir::Right);
+
+    assert_eq!(board.get_cell(3, 0), 2);
+    assert_eq!(board.get_cell(3, 3), 4);
+    assert_eq!(board.get_cell(2, 0), 0);
+    assert_eq!(board.get_cell(2, 3), 0);
 }
 
 #[test]
-fn case_no_loose_one_empty() {
+// 2  0
+// 4  8
+fn one_empty() {
     let mut board = Board::new(2);
     board.set_cell(0, 0, 2);
     board.set_cell(0, 1, 4);
     board.set_cell(1, 1, 8);
-    // cell (1,0) is free -> no loose assert!(!board.check_lose2());
-    assert!(!board.check_game_over());
+
+    // cell (1,0) is free!
+    assert_eq!(false, board.move_dir(Dir::Left));
+    assert_eq!(true, board.move_dir(Dir::Right));
 }
 
 #[test]
-fn case_no_loose_one_adjacent() {
+// 2  8
+// 4  8
+fn one_adjacent_down() {
     let mut board = Board::new(2);
     board.set_cell(0, 0, 2);
     board.set_cell(0, 1, 4);
     board.set_cell(1, 1, 8);
-     // cell (1,0) is adjacent to (1,1) with value 8
+    // cell (1,0) is adjacent to (1,1) with value 8
     board.set_cell(1, 0, 8);
-    assert!(!board.check_game_over());
+    assert_eq!(false, board.move_dir(Dir::Left));
+    assert_eq!(true, board.move_dir(Dir::Down));
 }
 
 #[test]
-fn case_loose_all_different() {
+// 2  8
+// 4  8
+fn one_adjacent_up() {
     let mut board = Board::new(2);
     board.set_cell(0, 0, 2);
     board.set_cell(0, 1, 4);
     board.set_cell(1, 1, 8);
-     // all the cells are different
-    board.set_cell(1, 0, 16);
-    assert!(board.check_game_over());
+    // cell (1,0) is adjacent to (1,1) with value 8
+    board.set_cell(1, 0, 8);
+    assert_eq!(false, board.move_dir(Dir::Left));
+    assert_eq!(true, board.move_dir(Dir::Up));
 }
 
-
-
-
-   
+#[test]
+fn lost_all_different() {
+    let mut board = Board::new(2);
+    board.set_cell(0, 0, 2);
+    board.set_cell(0, 1, 4);
+    board.set_cell(1, 1, 8);
+    // all the cells are different
+    board.set_cell(1, 0, 16);
+    assert_eq!(false, board.move_dir(Dir::Left));
+    assert_eq!(false, board.move_dir(Dir::Up));
+    assert_eq!(false, board.move_dir(Dir::Right));
+    assert_eq!(false, board.move_dir(Dir::Down));
+    assert_eq!(false, board.try_add_number());
+}

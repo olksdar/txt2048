@@ -1,31 +1,19 @@
 use std::io::{self, Write};
-use txt2048::Board;
-
-pub enum Dir {
-    Left,
-    Right,
-    Up,
-    Down,
-}
+use txt2048::{Board, Dir};
 
 fn main() {
-    let size = 4; // Size is 4x4
-
     let mut board = Board::new(4);
     board.init();
-    loop 
-    {
+    loop {
         print_board(&board);
-        
+
         let direction = get_input();
 
-        if !board.move_dir(direction) or !board.try_add_number() 
-        {
+        if !board.move_dir(direction) || !board.try_add_number() {
             println!("Better luck next time!");
         }
 
-        if board.check_win() 
-        {
+        if board.check_win() {
             println!("You are WINNER!!!");
             break;
         }
@@ -80,7 +68,9 @@ fn get_input() -> Dir {
         let mut guess = String::new();
 
         print!("Input: ");
-        io::stdout().flush().expect("Failed to flush!");
+        io::stdout()
+            .flush()
+            .expect("Failed to clear IO stdout buffer!");
         io::stdin()
             .read_line(&mut guess)
             .expect("Failed to read line!");
