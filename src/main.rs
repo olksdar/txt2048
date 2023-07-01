@@ -1,5 +1,5 @@
-use txt2048::Board;
 use std::io::{self, Write};
+use txt2048::Board;
 
 pub enum Dir {
     Left,
@@ -13,39 +13,19 @@ fn main() {
 
     let mut board = Board::new(4);
     board.init();
-    loop {
+    loop 
+    {
         print_board(&board);
-        if board.check_game_over() {
+        
+        let direction = get_input();
+
+        if !board.move_dir(direction) or !board.try_add_number() 
+        {
             println!("Better luck next time!");
-            break;
         }
-        let move_fn: Box<dyn Fn(usize, usize) -> usize>;
-        match get_input() {
-            Dir::Left => {
-                move_fn = Box::new(|base_line, index| base_line * size + index);
-            }
-            Dir::Right => {
-                move_fn = Box::new(|base_line, index| (1 + base_line) * size - 1 - index);
-            }
-            Dir::Up => {
-                move_fn = Box::new(|base_row, index| index * size + base_row);
-            }
-            Dir::Down => {
-                move_fn = Box::new(|base_row, index| size * (size - index - 1) + base_row);
-            }
-        }
-        let mut changed = false;
-        for i in 0..board.size() {
-            let res = board.move_any(i, &move_fn);
-            changed = changed || res;
-        }
-        //print!("good {}", changed);
-        if changed {
-            if !board.try_add_number() {
-                println!("Better luck next time!");
-            }
-        }
-        if board.check_win() {
+
+        if board.check_win() 
+        {
             println!("You are WINNER!!!");
             break;
         }
