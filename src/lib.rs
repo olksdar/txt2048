@@ -136,7 +136,7 @@ impl Board {
             None => return false,
             Some(freecell) => *freecell = v,
         }
-        return true;
+        true
     }
 
     /// Initializes the board.
@@ -233,7 +233,7 @@ impl Board {
 
     /// Returns true if game is won.
     pub fn check_win(&self) -> bool {
-        return self.max_num >= 2048;
+        self.max_num >= 2048
     }
 }
 
